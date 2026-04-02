@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>呪術登録 — Cursed Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Noto+Sans+JP:wght@900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–red: #e63946;
+–red-dark: #c1121f;
+–bg: #08080a;
+–card: #111114;
+–border: #1c1c20;
+–text: #e8e6e3;
+–muted: #666;
+–dim: #444;
+–font: ‘Zen Kaku Gothic New’, sans-serif;
+}
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–font);
+min-height: 100vh;
+-webkit-font-smoothing: antialiased;
+overflow-x: hidden;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+0%, 100% { box-shadow: 0 0 15px rgba(230,57,70,0.2); }
+50% { box-shadow: 0 0 35px rgba(230,57,70,0.5); }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes fillBar {
+from { width: 0; }
+}
+
+/* HERO */
+.hero {
+position: relative;
+padding: 56px 24px 28px;
+text-align: center;
+overflow: hidden;
+}
+
+.hero::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 200px;
+background: radial-gradient(ellipse at center top, rgba(230,57,70,0.08) 0%, transparent 70%);
+pointer-events: none;
+}
+
+.hero-kanji {
+font-family: ‘Noto Sans JP’, serif;
+font-size: 48px;
+font-weight: 900;
+color: var(–red);
+letter-spacing: 10px;
+text-shadow: 0 0 40px rgba(230,57,70,0.3);
+line-height: 1;
+animation: fadeUp 0.8s ease-out;
+}
+
+.hero-en {
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 14px;
+color: var(–muted);
+margin-top: 8px;
+animation: fadeUp 0.8s ease-out 0.1s both;
+}
+
+.hero-line {
+width: 50px;
+height: 1px;
+background: var(–red);
+margin: 18px auto;
+animation: fadeUp 0.8s ease-out 0.15s both;
+}
+
+.hero-desc {
+font-size: 12px;
+color: var(–dim);
+max-width: 300px;
+margin: 0 auto;
+line-height: 1.7;
+animation: fadeUp 0.8s ease-out 0.2s both;
+}
+
+/* ACCURACY METER */
+.accuracy-bar-wrap {
+max-width: 420px;
+margin: 0 auto;
+padding: 16px 20px 0;
+animation: fadeUp 0.6s ease-out 0.25s both;
+}
+
+.accuracy-label {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 6px;
+}
+
+.accuracy-label span {
+font-size: 9px;
+font-weight: 700;
+letter-spacing: 2px;
+color: var(–muted);
+}
+
+.accuracy-pct {
+font-size: 12px;
+font-weight: 900;
+color: var(–red);
+letter-spacing: 1px;
+}
+
+.accuracy-track {
+width: 100%;
+height: 4px;
+background: var(–border);
+border-radius: 4px;
+overflow: hidden;
+}
+
+.accuracy-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–red-dark), var(–red));
+border-radius: 4px;
+transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+width: 0%;
+}
+
+.accuracy-hint {
+font-size: 9px;
+color: var(–dim);
+text-align: center;
+margin-top: 6px;
+}
+
+/* FORM */
+.form-wrap {
+max-width: 420px;
+margin: 0 auto;
+padding: 4px 20px 80px;
+}
+
+.section { margin-top: 28px; }
+
+.section-head {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 12px;
+}
+
+.section-num {
+font-size: 10px;
+font-weight: 900;
+color: var(–red);
+letter-spacing: 1px;
+}
+
+.section-title {
+font-size: 11px;
+font-weight: 900;
+letter-spacing: 4px;
+color: var(–text);
+}
+
+.section-optional {
+font-size: 8px;
+color: var(–dim);
+letter-spacing: 2px;
+margin-left: auto;
+}
+
+/* PHOTO */
+.photo-row {
+display: flex;
+gap: 12px;
+align-items: flex-start;
+margin-bottom: 8px;
+}
+
+.photo-box {
+width: 120px;
+height: 120px;
+border-radius: 10px;
+border: 2px dashed #2a2a2e;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.3s;
+overflow: hidden;
+flex-shrink: 0;
+background-size: cover;
+background-position: center;
+}
+
+.photo-box:active { border-color: var(–red); }
+.photo-box.has-photo { border-style: solid; border-color: var(–red); }
+
+.photo-icon { font-size: 24px; margin-bottom: 2px; }
+.photo-label { font-size: 8px; font-weight: 700; letter-spacing: 1px; color: var(–muted); text-align: center; line-height: 1.4; }
+
+.photo-tips {
+font-size: 10px;
+color: var(–dim);
+line-height: 1.8;
+padding-top: 4px;
+}
+
+.photo-tips b { color: var(–muted); }
+
+.extra-photos-row {
+display: flex;
+gap: 8px;
+margin-top: 8px;
+}
+
+.extra-photo-box {
+width: 70px;
+height: 70px;
+border-radius: 8px;
+border: 1px dashed #222;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+font-size: 18px;
+color: var(–dim);
+transition: all 0.3s;
+overflow: hidden;
+background-size: cover;
+background-position: center;
+flex-shrink: 0;
+}
+
+.extra-photo-box:active { border-color: var(–red); }
+.extra-photo-box.has-photo { border-style: solid; border-color: #333; }
+
+.extra-label {
+font-size: 9px;
+color: var(–dim);
+margin-top: 6px;
+}
+
+/* INPUTS */
+.field { margin-bottom: 10px; }
+
+.field-label {
+font-size: 9px;
+font-weight: 700;
+letter-spacing: 2px;
+color: var(–muted);
+margin-bottom: 5px;
+display: flex;
+align-items: center;
+gap: 4px;
+}
+
+.field-label .req { color: var(–red); }
+.field-label .opt { color: var(–dim); font-weight: 400; }
+
+input[type=“text”], textarea, select {
+width: 100%;
+padding: 12px 14px;
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-size: 14px;
+font-family: var(–font);
+transition: all 0.2s;
+-webkit-appearance: none;
+}
+
+select {
+cursor: pointer;
+color: var(–muted);
+}
+
+select.filled { color: var(–text); }
+
+input:focus, textarea:focus, select:focus {
+outline: none;
+border-color: var(–red);
+box-shadow: 0 0 0 1px var(–red), 0 0 15px rgba(230,57,70,0.08);
+}
+
+input::placeholder, textarea::placeholder { color: #2a2a2e; }
+
+textarea {
+min-height: 64px;
+resize: vertical;
+line-height: 1.5;
+}
+
+/* INLINE PAIR */
+.field-row {
+display: flex;
+gap: 10px;
+}
+
+.field-row .field { flex: 1; min-width: 0; }
+
+/* CHIPS */
+.chip-grid {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-bottom: 8px;
+}
+
+.chip {
+padding: 7px 12px;
+border-radius: 18px;
+border: 1px solid #222;
+background: var(–card);
+font-size: 11px;
+color: #888;
+cursor: pointer;
+transition: all 0.15s;
+user-select: none;
+}
+
+.chip.active {
+background: rgba(230,57,70,0.12);
+border-color: var(–red);
+color: var(–red);
+font-weight: 700;
+}
+
+/* DIVIDER */
+.section-divider {
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–border), transparent);
+margin: 28px 0 0;
+}
+
+/* DETAIL TOGGLE */
+.detail-note {
+text-align: center;
+font-size: 10px;
+color: var(–dim);
+margin-top: 24px;
+line-height: 1.6;
+}
+
+.detail-note b { color: var(–muted); }
+
+/* SUBMIT */
+.submit-btn {
+width: 100%;
+padding: 18px;
+background: linear-gradient(135deg, var(–red), var(–red-dark));
+border: none;
+border-radius: 8px;
+color: #fff;
+font-family: var(–font);
+font-size: 13px;
+font-weight: 900;
+letter-spacing: 3px;
+cursor: pointer;
+margin-top: 28px;
+transition: all 0.3s;
+animation: pulseGlow 3s infinite;
+}
+
+.submit-btn:disabled { opacity: 0.3; cursor: not-allowed; animation: none; }
+.submit-btn:not(:disabled):active { transform: scale(0.98); }
+
+.submit-btn .spinner {
+display: inline-block;
+width: 16px; height: 16px;
+border: 2px solid rgba(255,255,255,0.3);
+border-top-color: #fff;
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+vertical-align: middle;
+margin-right: 8px;
+}
+
+.req-note { text-align: center; font-size: 10px; color: var(–dim); margin-top: 8px; }
+
+.status-msg {
+text-align: center;
+padding: 12px 16px;
+border-radius: 8px;
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 1px;
+margin-top: 12px;
+display: none;
+}
+
+.status-msg.error {
+display: block;
+background: rgba(230,57,70,0.1);
+border: 1px solid rgba(230,57,70,0.3);
+color: var(–red);
+}
+
+/* SUCCESS */
+.success-screen {
+display: none;
+min-height: 100vh;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 24px;
+text-align: center;
+}
+
+.success-screen.active { display: flex; }
+.success-icon { font-size: 72px; margin-bottom: 24px; animation: fadeUp 0.6s ease-out; }
+
+.success-title {
+font-size: 24px;
+font-weight: 900;
+letter-spacing: 6px;
+color: var(–red);
+margin-bottom: 16px;
+animation: fadeUp 0.6s ease-out 0.1s both;
+}
+
+.success-msg {
+font-size: 14px;
+color: var(–muted);
+line-height: 1.8;
+max-width: 280px;
+animation: fadeUp 0.6s ease-out 0.2s both;
+}
+
+.success-name { color: var(–red); font-weight: 700; }
+
+.success-pct {
+font-size: 36px;
+font-weight: 900;
+color: var(–red);
+margin-top: 20px;
+letter-spacing: 2px;
+animation: fadeUp 0.6s ease-out 0.3s both;
+}
+
+.success-pct-label {
+font-size: 9px;
+color: var(–dim);
+letter-spacing: 3px;
+margin-top: 4px;
+animation: fadeUp 0.6s ease-out 0.35s both;
+}
+
+.success-sub {
+font-size: 11px;
+color: var(–dim);
+margin-top: 24px;
+letter-spacing: 2px;
+animation: fadeUp 0.6s ease-out 0.4s both;
+}
+
+.form-view.hidden { display: none; }
+
+.setup-banner {
+background: rgba(230,57,70,0.08);
+border-bottom: 1px solid rgba(230,57,70,0.2);
+padding: 12px 20px;
+text-align: center;
+display: none;
+}
+
+.setup-banner.active { display: block; }
+
+.setup-banner p {
+font-size: 11px;
+color: var(–red);
+line-height: 1.6;
+max-width: 340px;
+margin: 0 auto;
+}
+
+.setup-banner code {
+background: rgba(230,57,70,0.15);
+padding: 2px 6px;
+border-radius: 3px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="form-view" id="formView">
+  <div class="setup-banner" id="setupBanner">
+    <p>⚠️ Replace <code>YOUR_ACCESS_KEY_HERE</code> in the HTML with your Web3Forms key → <b>web3forms.com</b></p>
+  </div>
+
+  <div class="hero">
+    <div class="hero-kanji">呪術登録</div>
+    <div class="hero-en">CURSED REGISTRY</div>
+    <div class="hero-line"></div>
+    <div class="hero-desc">Your cursed potential has been detected. The more you reveal, the more accurate your anime form will be.</div>
+  </div>
+
+  <!-- ACCURACY METER -->
+
+  <div class="accuracy-bar-wrap">
+    <div class="accuracy-label">
+      <span>CHARACTER ACCURACY</span>
+      <span class="accuracy-pct" id="accuracyPct">0%</span>
+    </div>
+    <div class="accuracy-track">
+      <div class="accuracy-fill" id="accuracyFill"></div>
+    </div>
+    <div class="accuracy-hint" id="accuracyHint">Fill out more fields to increase accuracy</div>
+  </div>
+
+  <div class="form-wrap">
+
+```
+<!-- 01: PHOTOS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <span class="section-title">REFERENCE PHOTOS</span>
+  </div>
+  <div class="photo-row">
+    <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+      <div class="photo-icon">📷</div>
+      <div class="photo-label">MAIN<br>SELFIE</div>
+    </div>
+    <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(this, 'main')">
+    <div class="photo-tips">
+      <b>Best results:</b><br>
+      • Clear face, good lighting<br>
+      • Front-facing, no sunglasses<br>
+      • Add side angle below for extra accuracy
+    </div>
+  </div>
+  <div class="extra-photos-row">
+    <div class="extra-photo-box" id="photoBox2" onclick="document.getElementById('photoInput2').click()">+</div>
+    <input type="file" id="photoInput2" accept="image/*" style="display:none" onchange="handlePhoto(this, 'side')">
+    <div class="extra-photo-box" id="photoBox3" onclick="document.getElementById('photoInput3').click()">+</div>
+    <input type="file" id="photoInput3" accept="image/*" style="display:none" onchange="handlePhoto(this, 'full')">
+    <div class="extra-photo-box" id="photoBox4" onclick="document.getElementById('photoInput4').click()">+</div>
+    <input type="file" id="photoInput4" accept="image/*" style="display:none" onchange="handlePhoto(this, 'extra')">
+  </div>
+  <div class="extra-label">Side angle • Full body • Extra reference</div>
+</div>
+
+<!-- 02: IDENTITY -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <span class="section-title">IDENTITY</span>
+  </div>
+  <div class="field">
+    <div class="field-label">FULL NAME <span class="req">*</span></div>
+    <input type="text" id="fname" placeholder="Your real name" oninput="updateAccuracy()">
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">NICKNAME</div>
+      <input type="text" id="fnick" placeholder="What people call you" oninput="updateAccuracy()">
+    </div>
+    <div class="field">
+      <div class="field-label">CONTACT</div>
+      <input type="text" id="fig" placeholder="IG / Snap / etc" oninput="updateAccuracy()">
+    </div>
+  </div>
+</div>
+
+<!-- 03: PHYSICAL DETAILS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <span class="section-title">APPEARANCE</span>
+    <span class="section-optional">MORE = MORE ACCURATE</span>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">GENDER</div>
+      <select id="fgender" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Non-binary</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="field-label">ETHNICITY</div>
+      <input type="text" id="fethnicity" placeholder="e.g. Black, Asian..." oninput="updateAccuracy()">
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">HEIGHT</div>
+      <input type="text" id="fheight" placeholder="e.g. 5'10, tall, short" oninput="updateAccuracy()">
+    </div>
+    <div class="field">
+      <div class="field-label">BUILD</div>
+      <select id="fbuild" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Slim / Lean</option>
+        <option>Average</option>
+        <option>Athletic / Muscular</option>
+        <option>Stocky / Thick</option>
+        <option>Heavy</option>
+        <option>Tall & Lanky</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">SKIN TONE</div>
+      <select id="fskin" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Very light / Pale</option>
+        <option>Light</option>
+        <option>Light-medium</option>
+        <option>Medium</option>
+        <option>Medium-dark</option>
+        <option>Dark</option>
+        <option>Very dark</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="field-label">FACE SHAPE</div>
+      <select id="fface" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Round</option>
+        <option>Oval</option>
+        <option>Square / Angular</option>
+        <option>Heart-shaped</option>
+        <option>Long / Rectangular</option>
+        <option>Diamond</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="field" style="margin-top:14px">
+    <div class="field-label">HAIR COLOR</div>
+    <input type="text" id="fhaircolor" placeholder="e.g. Black, brown, blonde, dyed blue..." oninput="updateAccuracy()">
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <div class="field-label">HAIR LENGTH</div>
+      <select id="fhairlength" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Buzzed / Bald</option>
+        <option>Very short</option>
+        <option>Short</option>
+        <option>Medium</option>
+        <option>Long</option>
+        <option>Very long</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="field-label">HAIR TEXTURE</div>
+      <select id="fhairtexture" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Straight</option>
+        <option>Wavy</option>
+        <option>Curly</option>
+        <option>Coily / Kinky</option>
+        <option>Locs</option>
+        <option>Braids</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">HAIR STYLE</div>
+    <input type="text" id="fhairstyle" placeholder="e.g. Fade, middle part, ponytail, messy..." oninput="updateAccuracy()">
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="field-row" style="margin-top:14px">
+    <div class="field">
+      <div class="field-label">EYE COLOR</div>
+      <input type="text" id="feyecolor" placeholder="e.g. Brown, hazel" oninput="updateAccuracy()">
+    </div>
+    <div class="field">
+      <div class="field-label">EYE SHAPE</div>
+      <select id="feyeshape" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+        <option value="">Select</option>
+        <option>Round</option>
+        <option>Almond</option>
+        <option>Hooded</option>
+        <option>Monolid</option>
+        <option>Downturned</option>
+        <option>Upturned</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">GLASSES?</div>
+    <div class="chip-grid" id="glassesChips">
+      <div class="chip" onclick="selectChip(this, 'fglasses')">No glasses</div>
+      <div class="chip" onclick="selectChip(this, 'fglasses')">Regular glasses</div>
+      <div class="chip" onclick="selectChip(this, 'fglasses')">Round glasses</div>
+      <div class="chip" onclick="selectChip(this, 'fglasses')">Contacts</div>
+    </div>
+    <input type="hidden" id="fglasses">
+  </div>
+
+  <div class="field">
+    <div class="field-label">DISTINGUISHING FEATURES</div>
+    <textarea id="ffeatures" placeholder="Scars, piercings, birthmarks, freckles, dimples, braces, tattoos, facial hair..." oninput="updateAccuracy()"></textarea>
+  </div>
+</div>
+
+<!-- 04: STYLE -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <span class="section-title">STYLE & VIBE</span>
+  </div>
+
+  <div class="field">
+    <div class="field-label">FASHION / HOW YOU DRESS</div>
+    <textarea id="ffashion" placeholder="e.g. Streetwear, hoodies and sweats, preppy, all black, athletic wear, vintage..." oninput="updateAccuracy()"></textarea>
+  </div>
+
+  <div class="field">
+    <div class="field-label">SIGNATURE ACCESSORY OR ITEM</div>
+    <input type="text" id="faccessory" placeholder="e.g. Always wears a chain, specific hat, headphones, rings..." oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">COLOR YOU WEAR MOST</div>
+    <input type="text" id="fcolor" placeholder="e.g. Black, earth tones, bright colors..." oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">OVERALL VIBE / AESTHETIC</div>
+    <input type="text" id="fvibe" placeholder="e.g. Chill, intimidating, goofy, mysterious, loud..." oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">HOW YOU CARRY YOURSELF</div>
+    <select id="fposture" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+      <option value="">Select</option>
+      <option>Confident / walks with purpose</option>
+      <option>Relaxed / laid back</option>
+      <option>Quiet / reserved presence</option>
+      <option>Energetic / always moving</option>
+      <option>Slouchy / low energy</option>
+      <option>Intimidating / commands a room</option>
+    </select>
+  </div>
+</div>
+
+<!-- 05: PERSONALITY -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <span class="section-title">PERSONALITY</span>
+  </div>
+
+  <div class="field">
+    <div class="field-label">DESCRIBE YOURSELF <span class="req">*</span></div>
+    <textarea id="fpersonality" placeholder="Your personality in 1-2 sentences. Be honest — this is the most important field." oninput="updateAccuracy()"></textarea>
+  </div>
+
+  <div class="field">
+    <div class="field-label">KNOWN FOR AT SCHOOL</div>
+    <input type="text" id="fknown" placeholder="The thing people associate with you" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">BIGGEST STRENGTH</div>
+    <input type="text" id="fstrength" placeholder="What you're best at or people rely on you for" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">BIGGEST WEAKNESS / FEAR</div>
+    <input type="text" id="ffear" placeholder="What gets under your skin or holds you back" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">DEFAULT MOOD / EXPRESSION</div>
+    <select id="fexpression" onchange="this.classList.toggle('filled', this.value); updateAccuracy()">
+      <option value="">Select</option>
+      <option>Usually smiling / laughing</option>
+      <option>Resting chill face</option>
+      <option>Resting mean face</option>
+      <option>Focused / serious</option>
+      <option>Zoned out / daydreaming</option>
+      <option>Smirking / mischievous</option>
+      <option>Blank / unreadable</option>
+    </select>
+  </div>
+</div>
+
+<!-- 06: SOCIAL MAP -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">06</span>
+    <span class="section-title">SOCIAL MAP</span>
+  </div>
+
+  <div class="field">
+    <div class="field-label">YOUR CLOSEST PEOPLE <span class="req">*</span></div>
+    <textarea id="fclosest" placeholder="Your top 3-5 closest friends at school" oninput="updateAccuracy()"></textarea>
+  </div>
+
+  <div class="field">
+    <div class="field-label">PEOPLE YOU DON'T VIBE WITH</div>
+    <input type="text" id="frivals" placeholder="Any tension, beef, or just don't click with" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">YOUR FRIEND GROUP / CLIQUE</div>
+    <input type="text" id="fgroup" placeholder="What's your group called or known as" oninput="updateAccuracy()">
+  </div>
+</div>
+
+<!-- 07: EXTRAS -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">07</span>
+    <span class="section-title">FINAL INTEL</span>
+  </div>
+
+  <div class="field">
+    <div class="field-label">A LINE THAT REPRESENTS YOU</div>
+    <input type="text" id="fquote" placeholder="Something you always say" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">YOUR THEME SONG</div>
+    <input type="text" id="fsong" placeholder="A song that IS you" oninput="updateAccuracy()">
+  </div>
+
+  <div class="field">
+    <div class="field-label">ANYTHING ELSE</div>
+    <textarea id="fnotes" placeholder="Inside jokes, fun facts, vibes, hobbies — anything the creator should know" oninput="updateAccuracy()"></textarea>
+  </div>
+</div>
+
+<div class="detail-note">
+  <b>The more you fill out, the more your anime character will actually look and feel like you.</b>
+</div>
+
+<button class="submit-btn" id="submitBtn" disabled onclick="submitForm()">
+  ⚡ REGISTER ⚡
+</button>
+<div class="req-note">* = required fields</div>
+<div class="status-msg" id="statusMsg"></div>
+```
+
+  </div>
+</div>
+
+<!-- SUCCESS -->
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">⚡</div>
+  <div class="success-title">REGISTERED</div>
+  <div class="success-msg">
+    Your identity has been recorded.<br>
+    Await your awakening, <span class="success-name" id="successName"></span>.
+  </div>
+  <div class="success-pct" id="successPct">0%</div>
+  <div class="success-pct-label">CHARACTER ACCURACY</div>
+  <div class="success-sub">THE CREATOR WILL DETERMINE YOUR FATE</div>
+</div>
+
+<script>
+  // =============================================
+  //  GET YOUR FREE KEY: https://web3forms.com
+  // =============================================
+  const ACCESS_KEY = 'f6fd9eb7-4d0f-4085-b28f-3b6fa0367055';
+  // =============================================
+
+  let photos = { main: '', side: '', full: '', extra: '' };
+
+  if (ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') {
+    document.getElementById('setupBanner')?.classList.add('active');
+  }
+
+  // TRACKED FIELDS (id → weight)
+  const fields = {
+    fname: 5, fnick: 1, fig: 1,
+    fgender: 2, fethnicity: 2, fheight: 2, fbuild: 3, fskin: 3, fface: 3,
+    fhaircolor: 4, fhairlength: 3, fhairtexture: 3, fhairstyle: 3,
+    feyecolor: 3, feyeshape: 2, fglasses: 1, ffeatures: 4,
+    ffashion: 4, faccessory: 3, fcolor: 2, fvibe: 3, fposture: 2,
+    fpersonality: 5, fknown: 2, fstrength: 2, ffear: 2, fexpression: 2,
+    fclosest: 4, frivals: 2, fgroup: 2,
+    fquote: 1, fsong: 1, fnotes: 2
+  };
+
+  const photoWeight = 10;
+  const maxScore = Object.values(fields).reduce((a, b) => a + b, 0) + (photoWeight * 4);
+
+  function getFieldVal(id) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    return (el.value || '').trim();
+  }
+
+  function updateAccuracy() {
+    let score = 0;
+    for (const [id, w] of Object.entries(fields)) {
+      if (getFieldVal(id)) score += w;
+    }
+    if (photos.main) score += photoWeight;
+    if (photos.side) score += photoWeight;
+    if (photos.full) score += photoWeight;
+    if (photos.extra) score += photoWeight;
+
+    const pct = Math.min(100, Math.round((score / maxScore) * 100));
+    document.getElementById('accuracyPct').textContent = pct + '%';
+    document.getElementById('accuracyFill').style.width = pct + '%';
+
+    const hints = [
+      [0, 'Fill out fields to increase accuracy'],
+      [15, 'Getting started...'],
+      [30, 'Basic outline forming'],
+      [45, 'Character taking shape'],
+      [60, 'Looking recognizable'],
+      [75, 'Strong resemblance'],
+      [85, 'Highly accurate'],
+      [95, 'Near perfect — your character will look just like you']
+    ];
+    let hint = hints[0][1];
+    for (const [threshold, text] of hints) {
+      if (pct >= threshold) hint = text;
+    }
+    document.getElementById('accuracyHint').textContent = hint;
+
+    // Validate required
+    const name = getFieldVal('fname');
+    const personality = getFieldVal('fpersonality');
+    const closest = getFieldVal('fclosest');
+    document.getElementById('submitBtn').disabled = !(name && personality && closest);
+  }
+
+  function selectChip(el, hiddenId) {
+    el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(hiddenId).value = el.textContent;
+    updateAccuracy();
+  }
+
+  function handlePhoto(input, slot) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const c = document.createElement('canvas');
+        const max = slot === 'main' ? 400 : 300;
+        let w = img.width, h = img.height;
+        if (w > max || h > max) { const r = Math.min(max/w, max/h); w *= r; h *= r; }
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        photos[slot] = c.toDataURL('image/jpeg', 0.6);
+
+        const boxMap = { main: 'photoBox', side: 'photoBox2', full: 'photoBox3', extra: 'photoBox4' };
+        const box = document.getElementById(boxMap[slot]);
+        box.style.backgroundImage = `url(${photos[slot]})`;
+        box.classList.add('has-photo');
+        if (slot === 'main') box.innerHTML = '';
+        else box.textContent = '';
+
+        updateAccuracy();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function row(label, value) {
+    if (!value) return '';
+    return `<tr><td style="padding:7px 0;border-bottom:1px solid #1a1a1a">
+      <div style="font-size:9px;color:#888;letter-spacing:2px;font-weight:bold;margin-bottom:2px">${label}</div>
+      <div style="font-size:13px;color:#ddd;line-height:1.4">${esc(value)}</div>
+    </td></tr>`;
+  }
+
+  async function submitForm() {
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('statusMsg');
+    status.className = 'status-msg'; status.style.display = 'none';
+
+    const data = {};
+    for (const id of Object.keys(fields)) {
+      data[id] = getFieldVal(id);
+    }
+
+    if (!data.fname || !data.fpersonality || !data.fclosest) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>SUBMITTING...';
+
+    // Build photo blocks
+    let photoHTML = '';
+    const photoLabels = { main: 'Main Photo', side: 'Side Angle', full: 'Full Body', extra: 'Extra Ref' };
+    for (const [slot, label] of Object.entries(photoLabels)) {
+      if (photos[slot]) {
+        photoHTML += `<div style="display:inline-block;margin:4px;text-align:center">
+          <img src="${photos[slot]}" style="max-width:${slot==='main'?'250':'150'}px;border-radius:6px;border:1px solid #333" alt="${label}">
+          <div style="font-size:9px;color:#666;margin-top:2px">${label}</div>
+        </div>`;
+      }
+    }
+
+    const pct = document.getElementById('accuracyPct').textContent;
+
+    const emailHTML = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#0a0a0b;color:#eee;font-family:Arial,sans-serif;border:1px solid #e63946;border-radius:8px;overflow:hidden">
+        <tr><td style="background:linear-gradient(135deg,#e63946,#c1121f);padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#fff;letter-spacing:4px">呪術登録</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.7);letter-spacing:6px;margin-top:3px">CURSED REGISTRY — ${esc(pct)} ACCURACY</div>
+        </td></tr>
+        <tr><td style="padding:16px">
+          ${photoHTML ? `<div style="margin-bottom:12px;text-align:center">${photoHTML}</div>` : ''}
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222">IDENTITY</td></tr>
+            ${row('NAME', data.fname)}
+            ${row('NICKNAME', data.fnick)}
+            ${row('CONTACT', data.fig)}
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222;padding-top:14px">APPEARANCE</td></tr>
+            ${row('GENDER', data.fgender)}
+            ${row('ETHNICITY', data.fethnicity)}
+            ${row('HEIGHT', data.fheight)}
+            ${row('BUILD', data.fbuild)}
+            ${row('SKIN TONE', data.fskin)}
+            ${row('FACE SHAPE', data.fface)}
+            ${row('HAIR COLOR', data.fhaircolor)}
+            ${row('HAIR LENGTH', data.fhairlength)}
+            ${row('HAIR TEXTURE', data.fhairtexture)}
+            ${row('HAIR STYLE', data.fhairstyle)}
+            ${row('EYE COLOR', data.feyecolor)}
+            ${row('EYE SHAPE', data.feyeshape)}
+            ${row('GLASSES', data.fglasses)}
+            ${row('DISTINGUISHING FEATURES', data.ffeatures)}
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222;padding-top:14px">STYLE</td></tr>
+            ${row('FASHION', data.ffashion)}
+            ${row('SIGNATURE ACCESSORY', data.faccessory)}
+            ${row('MAIN COLOR', data.fcolor)}
+            ${row('VIBE', data.fvibe)}
+            ${row('POSTURE / PRESENCE', data.fposture)}
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222;padding-top:14px">PERSONALITY</td></tr>
+            ${row('DESCRIPTION', data.fpersonality)}
+            ${row('KNOWN FOR', data.fknown)}
+            ${row('STRENGTH', data.fstrength)}
+            ${row('FEAR / WEAKNESS', data.ffear)}
+            ${row('DEFAULT EXPRESSION', data.fexpression)}
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222;padding-top:14px">SOCIAL MAP</td></tr>
+            ${row('CLOSEST FRIENDS', data.fclosest)}
+            ${row('TENSIONS / RIVALS', data.frivals)}
+            ${row('FRIEND GROUP', data.fgroup)}
+            <tr><td style="padding:8px 0;font-size:11px;color:#e63946;letter-spacing:3px;font-weight:900;border-bottom:1px solid #222;padding-top:14px">EXTRAS</td></tr>
+            ${row('SIGNATURE LINE', data.fquote)}
+            ${row('THEME SONG', data.fsong)}
+            ${row('NOTES', data.fnotes)}
+          </table>
+        </td></tr>
+        <tr><td style="padding:10px;text-align:center;border-top:1px solid #1a1a1a">
+          <div style="font-size:10px;color:#555">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+        </td></tr>
+      </table>
+    `;
+
+    try {
+      const payload = {
+        access_key: ACCESS_KEY,
+        subject: `⚡ ${data.fname} — ${pct} Accuracy`,
+        from_name: 'Cursed Registry',
+        message: emailHTML
+      };
+
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        document.getElementById('successName').textContent = data.fname;
+        document.getElementById('successPct').textContent = pct;
+        document.getElementById('formView').classList.add('hidden');
+        document.getElementById('successScreen').classList.add('active');
+      } else { throw new Error(result.message || 'Failed'); }
+    } catch (err) {
+      status.className = 'status-msg error';
+      status.style.display = 'block';
+      status.textContent = 'Failed to submit. Try again.';
+      btn.disabled = false;
+      btn.innerHTML = '⚡ REGISTER ⚡';
+      updateAccuracy();
+    }
+  }
+</script>
+
+</body>
+</html>
